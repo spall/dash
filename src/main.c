@@ -59,6 +59,7 @@
 #include "mystring.h"
 #include "exec.h"
 #include "cd.h"
+#include "timing.h"
 
 #define PROFILE 0
 
@@ -88,6 +89,7 @@ int main(int, char **);
 int
 main(int argc, char **argv)
 {
+        starttime(argc, argv);
 	char *shinit;
 	volatile int state;
 	struct jmploc jmploc;

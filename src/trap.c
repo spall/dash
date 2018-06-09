@@ -50,6 +50,7 @@
 #include "error.h"
 #include "trap.h"
 #include "mystring.h"
+#include "timing.h"
 
 /*
  * Sigmode records the current value of the signal handlers for the various
@@ -406,6 +407,9 @@ out:
 	if (likely(!setjmp(loc.loc)))
 		setjobctl(0);
 	flushall();
+
+        endtime();
+        
 	_exit(savestatus);
 	/* NOTREACHED */
 }
