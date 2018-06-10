@@ -10,9 +10,11 @@ const char* outputfile;
 static int oldscnum;
 static int argc;
 static char **argv;
+static pid_t caller;
 
 void starttime(int argc_, char **argv_)
 {
+        caller = getpid();
         argc = argc_;
         argv = argv_;
         // environment variables we use
@@ -47,7 +49,12 @@ void starttime(int argc_, char **argv_)
         fclose(scnum_file);
 
         FILE *out = fopen(outputfile, "a");
-        fprintf(out, "executing shell-command: %d\n", oldscnum);
+        fprintf(out, "executing shell-command: %d", oldscnum);
+	int i;
+	for(i = 0; i < argc; i ++) {
+	  fprintf(out, " %s", argv[i]);
+	}
+	fprintf(out, "\n");
         fflush(out);
         fclose(out);
         
@@ -67,6 +74,10 @@ void starttime(int argc_, char **argv_)
 void endtime()
 {
   
+        if (getpid() != caller) {
+	  return;
+	}
+	
         if (clock_gettime(CLOCK_REALTIME, end) == -1) {
           exit(EXIT_FAILURE);
         }

@@ -890,12 +890,12 @@ bail:
 
 	default:
 		/* Fork off a child process if necessary. */
-		if (!(flags & EV_EXIT) || have_traps()) {
+		//if (!(flags & EV_EXIT) || have_traps()) {
 			INTOFF;
 			jp = vforkexec(cmd, argv, path, cmdentry.u.index);
 			break;
-		}
-		shellexec(argv, path, cmdentry.u.index);
+			//}
+			//shellexec(argv, path, cmdentry.u.index);
 		/* NOTREACHED */
 
 	case CMDBUILTIN:
