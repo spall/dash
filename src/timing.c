@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/times.h>
 
 static struct timespec *start;
 static struct timespec *end;
@@ -81,6 +82,22 @@ void endtime()
         if (clock_gettime(CLOCK_REALTIME, end) == -1) {
           exit(EXIT_FAILURE);
         }
+
+        struct tms *cpu_time = malloc(sizeof(struct tms));
+        if (cpu_time == NULL) {
+          perror("malloc");
+          exit(EXIT_FAILURE);
+        }
+
+        if (times(cpu_time) == -1) {
+          exit(EXIT_FAILURE);
+        }
+
+        fprintf(stderr, "cpu is %lld\n", cpu_time->tms_cutime);
+        
+        double user_time = ((double)(cpu_time->tms_utime + cpu_time->tms_cutime)) / CLOCKS_PER_SEC;
+        double sys_time = ((double)(cpu_time->tms_stime + cpu_time->tms_cstime)) / CLOCKS_PER_SEC;
+         
         struct timespec *tt = malloc(sizeof(struct timespec));
         if (tt == NULL) {
           perror("malloc");
@@ -101,7 +118,8 @@ void endtime()
         for(i = 0; i < argc; i ++) {
           fprintf(out, " %s", argv[i]);
         }
-        fprintf(out, "\nelapsed= %lld.%.9ld\n finished shell-command: %d\n", (long long)tt->tv_sec, tt->tv_nsec, oldscnum);
+        fprintf(out, "\nelapsed= %lld.%.9ld; user= %f ; sys= %f\n", (long long)tt->tv_sec, tt->tv_nsec, user_time, sys_time);
+        fprintf(out, "finished shell-command: %d\n", oldscnum);
         fflush(out);
         fclose(out);
 }
